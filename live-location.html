@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Live Location Tracker</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            text-align: center;
+            padding: 40px;
+        }
+
+        h1 {
+            color: #2c3e50;
+        }
+
+        button {
+            padding: 12px 25px;
+            font-size: 16px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+
+        .box {
+            margin-top: 25px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            display: inline-block;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        iframe {
+            margin-top: 20px;
+            width: 100%;
+            height: 300px;
+            border-radius: 10px;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>📍 Live Location Tracker</h1>
+    <p>Click the button to share your live location (with permission)</p>
+
+    <button onclick="startTracking()">Allow Location</button>
+
+    <div class="box" id="locationBox">
+        <p><b>Status:</b> Waiting for permission...</p>
+    </div>
+
+    <script>
+        function startTracking() {
+            if (!navigator.geolocation) {
+                document.getElementById("locationBox").innerHTML =
+                    "<p>Geolocation is not supported by your browser.</p>";
+                return;
+            }
+
+            navigator.geolocation.watchPosition(
+                showPosition,
+                showError,
+                { enableHighAccuracy: true }
+            );
+        }
+
+        function showPosition(position) {
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+
+            document.getElementById("locationBox").innerHTML = `
+                <p><b>Latitude:</b> ${lat}</p>
+                <p><b>Longitude:</b> ${lon}</p>
+
+                <iframe
+                    src="https://www.google.com/maps?q=${lat},${lon}&output=embed">
+                </iframe>
+            `;
+        }
+
+        function showError(error) {
+            let message = "";
+            switch(error.code) {
+                case error.PERMISSION_DENIED:
+                    message = "Permission denied by user.";
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    message = "Location unavailable.";
+                    break;
+                case error.TIMEOUT:
+                    message = "Location request timed out.";
+                    break;
+                default:
+                    message = "An unknown error occurred.";
+            }
+
+            document.getElementById("locationBox").innerHTML = `<p>${message}</p>`;
+        }
+    </script>
+
+</body>
+</html>
